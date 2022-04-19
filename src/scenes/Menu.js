@@ -28,7 +28,7 @@ class Menu extends Phaser.Scene {
         this.add.text(game.config.width/2, game.config.height/2 , 'P1 Use (A) (D) to move & (W) to Fire\nP2 Use <- -> to move & (UP) to Fire', menuConfig).setOrigin(0.5);
         menuConfig.backgroundColor = '#B3FF00';
         menuConfig.color = '#800';
-        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding + 64, 'Multiplayer Modes:   \nPress <- for Synchronous\nPress -> for Alternating\nPress (W) for SinglePlayer', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding + 64, 'Multiplayer Modes:   \nPress <- for Simultaneous\nPress -> for Alternating\nPress (W) for SinglePlayer', menuConfig).setOrigin(0.5);
 
         //display high score
         this.add.text(game.config.width/2, game.config.height - borderUISize - borderPadding, 'HIGH SCORE: ' + highScore, menuConfig).setOrigin(0.5);
