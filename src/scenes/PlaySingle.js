@@ -1,12 +1,11 @@
-class Play extends Phaser.Scene {
+class PlaySingle extends Phaser.Scene {
     constructor() {
-        super("playScene");
+        super("playSingle");
     }
 
     preload() {
         //load images/tile sprites
-        this.load.image('rocket1', './assets/rocket1.png');
-        this.load.image('rocket2', "./assets/rocket2.png");
+        this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.image('starfield', './assets/starfield.png');
         this.load.image('fighter', './assets/fighter.png');
@@ -29,8 +28,7 @@ class Play extends Phaser.Scene {
         this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0,0);
         
         //add rocket (p1)
-        this.p1Rocket = new Rocket1(this, game.config.width/2 - 30, game.config.height - borderUISize - borderPadding, 'rocket1').setOrigin(0.5,0);
-        this.p2Rocket = new Rocket2(this, game.config.width/2 + 30, game.config.height - borderUISize - borderPadding, 'rocket2').setOrigin(0.5,0);
+        this.p1Rocket = new Rocket1(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5,0);
 
         //define keys
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -39,7 +37,6 @@ class Play extends Phaser.Scene {
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 
         //add spaceships x3
         this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0,0);
@@ -63,7 +60,6 @@ class Play extends Phaser.Scene {
 
         // init score
         this.p1Score = 0;
-        this.p2Score = 0;
 
         //display score
         let scoreConfig = {
@@ -79,32 +75,20 @@ class Play extends Phaser.Scene {
             fixedWidth: 100
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
-        this.scoreRight = this.add.text(game.config.width - 100 -(borderUISize + borderPadding), borderUISize + borderPadding*2, this.p2Score, scoreConfig);
         this.scoreHigh = this.add.text(game.config.width/2 -50, game.config.height - borderUISize, highScore, scoreConfig );
 
         //GAME OVER flag
         this.gameOver = false;
 
-
         // play clock
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
-            this.winMessage = this.add.text(game.config.width/2, game.config.height/2 - 64, 'ajifohjaig', scoreConfig).setOrigin(0.5);
-            if(this.p1Score > this.p2Score) {
-                this.winMessage.text = "PLAYER 1 WINS";
-            }
-            else if(this.p1Score < this.p2Score) {
-                this.winMessage.text = "PLAYER 2 WINS";
-            }
-            else {
-                this.winMessage.text = "IT'S A TIE";
-            }
+            this.winMessage = this.add.text(game.config.width/2, game.config.height/2 - 60, "SCORE: " +  this.p1Score, scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Continue or <- for Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
-            if(this.p1Score > highScore || this.p2Score > highScore) {
+            if(this.p1Score > highScore) {
                 highScore = this.p1Score;
-                if(this.p2Score = highScore) {highScore = this.p2Score;}
                 this.scoreHigh.text = highScore;
                 this.add.text(game.config.width/2, game.config.height/2+64+64, 'New High Score: ' + highScore, scoreConfig).setOrigin(0.5);
             }
@@ -143,12 +127,12 @@ class Play extends Phaser.Scene {
 
         if(!this.gameOver) {
             this.p1Rocket.update();
-            this.p2Rocket.update();
             this.ship01.update();
             this.ship02.update();
             this.ship03.update();
             this.fighter01.update();
         }
+
 
         //check collisions p1
         if(this.checkCollision(this.p1Rocket, this.ship03)) {
@@ -168,25 +152,8 @@ class Play extends Phaser.Scene {
             this.p1Rocket.reset();
             this.p1FighterExplode(this.fighter01);
         }
-
-        //check collisions p2
-        if(this.checkCollision(this.p2Rocket, this.ship03)) {
-            this.p2Rocket.reset();
-            this.p2ShipExplode(this.ship03);
-        }
-        if(this.checkCollision(this.p2Rocket, this.ship02)) {
-            this.p2Rocket.reset();
-            this.p2ShipExplode(this.ship02);
-        }
-        if(this.checkCollision(this.p2Rocket, this.ship01)) {
-            this.p2Rocket.reset();
-            this.p2ShipExplode(this.ship01);
-        }
-
-        if(this.checkCollision(this.p2Rocket, this.fighter01)) {
-            this.p2Rocket.reset();
-            this.p2FighterExplode(this.fighter01);
-        }
+    
+        
 
     }
 
@@ -221,41 +188,6 @@ class Play extends Phaser.Scene {
         this.sound.play('sfx_explosion');
     }
 
-    p2ShipExplode(ship) {
-        //temp hide ship
-        ship.alpha = 0;
-        //create explosion
-        let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0,0);
-        boom.anims.play('explode');
-        boom.on('animationcomplete', () => {
-            ship.reset();
-            ship.alpha = 1;
-            boom.destroy();
-        });
-
-        //score add and repaint
-        this.p2Score += ship.points;
-        this.scoreRight.text = this.p2Score;
-        this.sound.play('sfx_explosion');
-    }
-
-    p2FighterExplode(ship) {
-        //temp hide ship
-        ship.alpha = 0;
-        //create explosion
-        let boom = this.add.sprite(ship.x, ship.y, 'explosionf').setOrigin(0,0);
-        boom.anims.play('explode');
-        boom.on('animationcomplete', () => {
-            ship.reset();
-            ship.alpha = 1;
-            boom.destroy();
-        });
-
-        //score add and repaint
-        this.p2Score += ship.points;
-        this.scoreRight.text = this.p2Score;
-        this.sound.play('sfx_explosion');
-    }
 
     p1FighterExplode(ship) {
         //temp hide ship
@@ -276,7 +208,7 @@ class Play extends Phaser.Scene {
     }
 
     randomizeDirection(ship) {
-        let dir = Phaser.Math.Between(1,2);
+        let dir = Phaser.Math.Between(1,2);;
         if(dir == 2) {
             ship.flipX = true;
             ship.moveSpeed *= -1;

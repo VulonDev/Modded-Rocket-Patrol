@@ -1,12 +1,11 @@
-class Play extends Phaser.Scene {
+class PlayAlt extends Phaser.Scene {
     constructor() {
-        super("playScene");
+        super("playAltScene");
     }
 
     preload() {
         //load images/tile sprites
-        this.load.image('rocket1', './assets/rocket1.png');
-        this.load.image('rocket2', "./assets/rocket2.png");
+        this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.image('starfield', './assets/starfield.png');
         this.load.image('fighter', './assets/fighter.png');
@@ -29,8 +28,7 @@ class Play extends Phaser.Scene {
         this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0,0);
         
         //add rocket (p1)
-        this.p1Rocket = new Rocket1(this, game.config.width/2 - 30, game.config.height - borderUISize - borderPadding, 'rocket1').setOrigin(0.5,0);
-        this.p2Rocket = new Rocket2(this, game.config.width/2 + 30, game.config.height - borderUISize - borderPadding, 'rocket2').setOrigin(0.5,0);
+        this.p1Rocket = new Rocket1(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(0.5,0);
 
         //define keys
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -39,7 +37,6 @@ class Play extends Phaser.Scene {
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 
         //add spaceships x3
         this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0,0);
@@ -62,7 +59,7 @@ class Play extends Phaser.Scene {
         });
 
         // init score
-        this.p1Score = 0;
+        this.p1Score = rememberScore;
         this.p2Score = 0;
 
         //display score
@@ -85,22 +82,27 @@ class Play extends Phaser.Scene {
         //GAME OVER flag
         this.gameOver = false;
 
-
         // play clock
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
-            this.winMessage = this.add.text(game.config.width/2, game.config.height/2 - 64, 'ajifohjaig', scoreConfig).setOrigin(0.5);
-            if(this.p1Score > this.p2Score) {
-                this.winMessage.text = "PLAYER 1 WINS";
+            this.winMessage = this.add.text(game.config.width/2, game.config.height/2 - 60, 'ajifohjaig', scoreConfig).setOrigin(0.5);
+            if(rememberScore == 0) {
+                this.winMessage.text = "Player 1: " + this.p1Score + "    \nContinue to Player 2";
+                rememberScore = this.p1Score;
             }
-            else if(this.p1Score < this.p2Score) {
+            else if (rememberScore > this.p2Score) {
+                this.winMessage.text = "PLAYER 1 WINS";
+                rememberScore = 0;
+            }
+            else if (rememberScore < this.p2Score) {
                 this.winMessage.text = "PLAYER 2 WINS";
+                rememberScore = 0;
             }
             else {
                 this.winMessage.text = "IT'S A TIE";
+                rememberScore = 0;
             }
-            this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or <- for Menu', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Continue or <- for Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
             if(this.p1Score > highScore || this.p2Score > highScore) {
                 highScore = this.p1Score;
@@ -143,49 +145,51 @@ class Play extends Phaser.Scene {
 
         if(!this.gameOver) {
             this.p1Rocket.update();
-            this.p2Rocket.update();
             this.ship01.update();
             this.ship02.update();
             this.ship03.update();
             this.fighter01.update();
         }
 
-        //check collisions p1
-        if(this.checkCollision(this.p1Rocket, this.ship03)) {
-            this.p1Rocket.reset();
-            this.p1ShipExplode(this.ship03);
-        }
-        if(this.checkCollision(this.p1Rocket, this.ship02)) {
-            this.p1Rocket.reset();
-            this.p1ShipExplode(this.ship02);
-        }
-        if(this.checkCollision(this.p1Rocket, this.ship01)) {
-            this.p1Rocket.reset();
-            this.p1ShipExplode(this.ship01);
-        }
+        if(rememberScore == 0) {
+            //check collisions p1
+            if(this.checkCollision(this.p1Rocket, this.ship03)) {
+                this.p1Rocket.reset();
+                this.p1ShipExplode(this.ship03);
+            }
+            if(this.checkCollision(this.p1Rocket, this.ship02)) {
+                this.p1Rocket.reset();
+                this.p1ShipExplode(this.ship02);
+            }
+            if(this.checkCollision(this.p1Rocket, this.ship01)) {
+                this.p1Rocket.reset();
+                this.p1ShipExplode(this.ship01);
+            }
 
-        if(this.checkCollision(this.p1Rocket, this.fighter01)) {
-            this.p1Rocket.reset();
-            this.p1FighterExplode(this.fighter01);
+            if(this.checkCollision(this.p1Rocket, this.fighter01)) {
+                this.p1Rocket.reset();
+                this.p1FighterExplode(this.fighter01);
+            }
         }
+        else {
+            //check collisions p2
+            if(this.checkCollision(this.p1Rocket, this.ship03)) {
+                this.p1Rocket.reset();
+                this.p2ShipExplode(this.ship03);
+            }
+            if(this.checkCollision(this.p1Rocket, this.ship02)) {
+                this.p1Rocket.reset();
+                this.p2ShipExplode(this.ship02);
+            }
+            if(this.checkCollision(this.p1Rocket, this.ship01)) {
+                this.p1Rocket.reset();
+                this.p2ShipExplode(this.ship01);
+            }
 
-        //check collisions p2
-        if(this.checkCollision(this.p2Rocket, this.ship03)) {
-            this.p2Rocket.reset();
-            this.p2ShipExplode(this.ship03);
-        }
-        if(this.checkCollision(this.p2Rocket, this.ship02)) {
-            this.p2Rocket.reset();
-            this.p2ShipExplode(this.ship02);
-        }
-        if(this.checkCollision(this.p2Rocket, this.ship01)) {
-            this.p2Rocket.reset();
-            this.p2ShipExplode(this.ship01);
-        }
-
-        if(this.checkCollision(this.p2Rocket, this.fighter01)) {
-            this.p2Rocket.reset();
-            this.p2FighterExplode(this.fighter01);
+            if(this.checkCollision(this.p1Rocket, this.fighter01)) {
+                this.p1Rocket.reset();
+                this.p2FighterExplode(this.fighter01);
+            }
         }
 
     }

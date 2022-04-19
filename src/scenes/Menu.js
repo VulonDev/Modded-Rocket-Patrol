@@ -24,22 +24,23 @@ class Menu extends Phaser.Scene {
             fixedWidth: 0
         } 
         
-        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'ROCKET PATROL', menuConfig).setOrigin(0.5);
-        this.add.text(game.config.width/2, game.config.height/2, 'Use <- -> arrows to move & (F) to fire', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding - 30, 'MODDED ROCKET PATROL', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, game.config.height/2 , 'P1 Use (A) (D) to move & (W) to Fire\nP2 Use <- -> to move & (UP) to Fire', menuConfig).setOrigin(0.5);
         menuConfig.backgroundColor = '#B3FF00';
         menuConfig.color = '#800';
-        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding, 'Press <- for Novice or -> for Expert', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding + 64, 'Multiplayer Modes:   \nPress <- for Synchronous\nPress -> for Alternating\nPress (W) for SinglePlayer', menuConfig).setOrigin(0.5);
 
-        //display high scoret
+        //display high score
         this.add.text(game.config.width/2, game.config.height - borderUISize - borderPadding, 'HIGH SCORE: ' + highScore, menuConfig).setOrigin(0.5);
         //keys
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     }
 
     update() {
         if(Phaser.Input.Keyboard.JustDown(keyLEFT)) {
-            //easy
+            //synch multiplayer
             game.settings = {
                 spaceshipSpeed: 3,
                 gameTimer: 60000
@@ -48,13 +49,22 @@ class Menu extends Phaser.Scene {
             this.scene.start('playScene');
         }
         if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
-            //hard
+            //alternating multiplayer
             game.settings = {
-                spaceshipSpeed: 4,
-                gameTimer: 45000
+                spaceshipSpeed: 3,
+                gameTimer: 60000
             }
             this.sound.play('sfx_select');
-            this.scene.start('playScene');
+            this.scene.start('playAltScene');
+        }
+        if (Phaser.Input.Keyboard.JustDown(keyW)) {
+            //singleplayer
+            game.settings = {
+                spaceshipSpeed: 3,
+                gameTimer: 60000
+            }
+            this.sound.play('sfx_select');
+            this.scene.start('playSingle');
         }
     }
 }
