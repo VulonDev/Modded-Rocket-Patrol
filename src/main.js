@@ -1,13 +1,24 @@
-/* MODDED CHANGES:
+/*
+Elizabeth Arnold - Rocket Patrol Mods
+This took about 5.5 hours to complete
 
-track and display high score (5) DONE
-speed increase 30 sec into the game (5) DONE
-simultaneous 2 player mode (30) DONE
-smaller, faster ship (20) DONE
-alternating 2 player mode (20) DONE
-display time remaining on the screen (10) DONE
-randomize ship movement (5) DONE
-allow player to control rocket after firing (5) DONE
+MODDED CHANGES:
+
+track and display high score (5)
+speed increase 30 sec into the game (5) 
+simultaneous 2 player mode (30) 
+smaller, faster ship (20) 
+alternating 2 player mode (20) 
+display time remaining on the screen (10)
+randomize ship movement (5) 
+allow player to control rocket after firing (5) 
+
+alternating, singleplayer, and simultaneous multiplayer are separate modes to be selected
+at the menu screen. all three modes include every mod, except of course the mutually exclusive singleplayer/multiplayer modes.
+in each mode the ui is adjusted to be appropriate to the mode, in terms of score display and (for simultaneous multiplayer) the color of the rockets.
+
+simultaneous multiplayer is played with two people on the same keyboard. one uses W, A, D and the other uses UP, LEFT, RIGHT arrows.
+alternating multiplayer and singleplayer both always use W, A, D. 
 
 */
 
