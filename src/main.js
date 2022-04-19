@@ -1,3 +1,9 @@
+/* MODDED CHANGES:
+
+track and display high score (5)
+
+*/
+
 let config = {
     type: Phaser.AUTO,
     width: 640,
@@ -13,4 +19,4 @@ let borderPadding = borderUISize /3;
 
 //reserve keyboard vars
 let keyF, keyR, keyLEFT, keyRIGHT;
-
+let highScore = 0;
