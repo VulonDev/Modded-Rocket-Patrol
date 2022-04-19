@@ -27,14 +27,17 @@ class Play extends Phaser.Scene {
         this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0,0);
         
         //add rocket (p1)
-        this.p1Rocket = new Rocket1(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket1').setOrigin(0.5,0);
-        this.p2Rocket = new Rocket2(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket2').setOrigin(0.5,0);
+        this.p1Rocket = new Rocket1(this, game.config.width/2 - 30, game.config.height - borderUISize - borderPadding, 'rocket1').setOrigin(0.5,0);
+        this.p2Rocket = new Rocket2(this, game.config.width/2 + 30, game.config.height - borderUISize - borderPadding, 'rocket2').setOrigin(0.5,0);
 
         //define keys
-        keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 
         //add spaceships x3
         this.ship01 = new Spaceship(this, game.config.width + borderUISize*6, borderUISize*4, 'spaceship', 0, 30).setOrigin(0,0);
@@ -42,8 +45,13 @@ class Play extends Phaser.Scene {
         this.ship03 = new Spaceship(this, game.config.width, borderUISize*6 + borderPadding*4, 'spaceship', 0, 10).setOrigin(0,0);
 
         //add fighter
-        this.fighter01 = new Fighter(this, game.config.width + borderUISize * 7, borderUISize*5 + borderPadding*2, 'spaceship', 0, 50).setOrigin(0,0);
+        this.fighter01 = new Fighter(this, game.config.width + borderUISize * 3, borderUISize*8 + borderPadding*2, 'spaceship', 0, 50).setOrigin(0,0);
 
+        //randomize ship movement
+        this.randomizeDirection(this.ship01);
+        this.randomizeDirection(this.ship02);
+        this.randomizeDirection(this.ship03);
+        this.randomizeDirection(this.fighter01)
         //animation config
         this.anims.create({
             key: 'explode',
@@ -69,13 +77,14 @@ class Play extends Phaser.Scene {
             fixedWidth: 100
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, this.p1Score, scoreConfig);
-        this.scoreRight = this.add.text(borderUISize + borderPadding + 125, borderUISize + borderPadding*2, this.p2Score, scoreConfig);
-        this.scoreHigh = this.add.text(borderUISize + borderPadding + 250, borderUISize + borderPadding*2, highScore, scoreConfig );
+        this.scoreRight = this.add.text(game.config.width - 100 -(borderUISize + borderPadding), borderUISize + borderPadding*2, this.p2Score, scoreConfig);
+        this.scoreHigh = this.add.text(game.config.width/2 -50, game.config.height - borderUISize, highScore, scoreConfig );
 
         //GAME OVER flag
         this.gameOver = false;
 
-        //60-sec play clock
+
+        // play clock
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, () => {
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
@@ -88,6 +97,19 @@ class Play extends Phaser.Scene {
                 this.add.text(game.config.width/2, game.config.height/2+64+64, 'New High Score: ' + highScore, scoreConfig).setOrigin(0.5);
             }
         }, null, this);
+
+        //speed increase after 30 sec
+        this.speedUp = this.time.delayedCall(30000, () => {
+            this.ship01.speedUp();
+            this.ship02.speedUp();
+            this.ship03.speedUp();
+            this.fighter01.speedUp();
+        }, null, this);
+
+        //display timer
+
+
+        
     }
 
     update() {
@@ -195,7 +217,16 @@ class Play extends Phaser.Scene {
 
         //score add and repaint
         this.p2Score += ship.points;
-        this.scoreLeft.text = this.p2Score;
+        this.scoreRight.text = this.p2Score;
         this.sound.play('sfx_explosion');
+    }
+
+    randomizeDirection(ship) {
+        let dir = Phaser.Math.Between(1,2);
+        console.log(dir);
+        if(dir == 2) {
+            ship.flipX = true;
+            ship.moveSpeed *= -1;
+        }
     }
 }

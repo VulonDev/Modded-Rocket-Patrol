@@ -11,10 +11,22 @@ class Fighter extends Phaser.GameObjects.Sprite {
         if(this.x <= 0 - this.width) {
             this.x = game.config.width;
         }
+        if(this.x >= game.config.width + this.width) {
+            this.x = 0;
+        }
     }
 
     //position reset
     reset() {
         this.x = game.config.width;
+    }
+
+    speedUp() {
+        if(this.flipX) {
+            this.moveSpeed -= 2;
+        }
+        else {
+            this.moveSpeed += 2;
+        }
     }
 }
